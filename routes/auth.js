@@ -5,11 +5,8 @@ const User = require('../models/User');
 const sendVerificationEmail = require('../utils/sendVerificationEmail');
 
 const router = Router();
-
-// Variável temporária para armazenar os dados antes do registro
 let tempUserData = {};
 
-// Rota de Registro - Envia código de verificação por email
 router.post('/register', async (req, res) => {
   const { nome, email, dataNascimento, telefone, password } = req.body;
 
@@ -23,10 +20,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Usuário já existe' });
     }
 
-    // Gera um código de verificação aleatório
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Armazena os dados do usuário temporariamente
     tempUserData[email] = {
       nome,
       email,
@@ -36,7 +31,6 @@ router.post('/register', async (req, res) => {
       verificationCode
     };
 
-    // Envia o código de verificação por email
     await sendVerificationEmail(email, verificationCode);
 
     res.status(200).json({ message: 'Código de verificação enviado para o email!' });
@@ -46,24 +40,20 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Rota de Verificação do Código
 router.post('/verify-code', async (req, res) => {
   const { email, code } = req.body;
 
   try {
     const userData = tempUserData[email];
 
-    // Verificar se os dados temporários do usuário existem
     if (!userData) {
       return res.status(400).json({ error: 'Dados do usuário não encontrados ou expirados' });
     }
 
-    // Verificar o código de verificação
     if (userData.verificationCode !== code) {
       return res.status(400).json({ error: 'Código de verificação incorreto' });
     }
 
-    // Criar o usuário no banco de dados após a verificação
     const newUser = await User.create({
       nome: userData.nome,
       email: userData.email,
@@ -73,7 +63,6 @@ router.post('/verify-code', async (req, res) => {
       isVerified: true
     });
 
-    // Remover os dados temporários após o registro bem-sucedido
     delete tempUserData[email];
 
     res.status(201).json({ message: 'Email verificado com sucesso! Usuário registrado.', userId: newUser.id });
@@ -83,7 +72,6 @@ router.post('/verify-code', async (req, res) => {
   }
 });
 
-// Rota de Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 

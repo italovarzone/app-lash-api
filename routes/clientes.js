@@ -42,13 +42,11 @@ router.post('/clientes', async (req, res) => {
     procedimentoFavorito,
   } = req.body;
 
-  // Verificação se todos os campos obrigatórios estão presentes
   if (!nome || !email || !telefone || !dataNascimento || !cep || !logradouro || !bairro || !cidade || !uf || !numero || !procedimentoFavorito) {
     return res.status(400).json({ message: "Todos os campos são obrigatórios." });
   }
 
   try {
-    // Criação do cliente no banco de dados com todos os campos
     const cliente = await Cliente.create({
       nome,
       email,
@@ -74,7 +72,6 @@ router.put('/clientes/:id', async (req, res) => {
   const { id } = req.params;
   const { nome, email, telefone, dataNascimento, cep, logradouro, bairro, cidade, uf, numero, complemento, procedimentoFavorito } = req.body;
 
-  // Verificação se todos os campos obrigatórios estão presentes
   if (!nome || !email || !telefone || !dataNascimento || !cep || !logradouro || !bairro || !cidade || !uf || !numero || !procedimentoFavorito) {
     return res.status(400).json({ message: "Todos os campos são obrigatórios." });
   }
@@ -85,7 +82,6 @@ router.put('/clientes/:id', async (req, res) => {
       return res.status(404).json({ message: "Cliente não encontrado." });
     }
 
-    // Atualiza o cliente com os novos dados
     await cliente.update({ nome, email, telefone, dataNascimento, cep, logradouro, bairro, cidade, uf, numero, complemento, procedimentoFavorito });
     res.status(200).json(cliente);
   } catch (error) {
@@ -94,15 +90,14 @@ router.put('/clientes/:id', async (req, res) => {
   }
 });
 
-// Rota para listar todos os clientes
 router.get('/clientes', async (req, res) => {
-  const { page = 1, limit = 10 } = req.query; // Padrão: página 1, 10 clientes por página
+  const { page = 1, limit = 10 } = req.query;
 
   try {
     const clientes = await Cliente.findAndCountAll({
       limit: parseInt(limit),
       offset: (page - 1) * limit,
-      order: [['createdAt', 'DESC']], // Ordena pela data de criação mais recente
+      order: [['createdAt', 'DESC']],
     });
 
     res.status(200).json({
