@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const Cliente = require('../models/Cliente');
+const { Op } = require('sequelize');
 
 const router = Router();
 
@@ -87,6 +88,42 @@ router.put('/clientes/:id', async (req, res) => {
   } catch (error) {
     console.error('Erro ao editar cliente:', error);
     res.status(500).json({ message: "Erro ao editar cliente." });
+  }
+});
+
+router.delete('/clientes/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const cliente = await Cliente.findByPk(id);
+    if (!cliente) {
+      return res.status(404).json({ message: "Cliente não encontrado." });
+    }
+
+    await cliente.destroy();
+    res.status(200).json({ message: "Cliente excluído com sucesso." });
+  } catch (error) {
+    console.error('Erro ao excluir cliente:', error);
+    res.status(500).json({ message: "Erro ao excluir cliente." });
+  }
+});
+
+// Endpoint de busca de clientes por nome (pode ser ajustado conforme sua implementação)
+router.get('/clientes/search', async (req, res) => {
+  const { nome } = req.query; // Obtém o nome da query string
+
+  try {
+    const clientes = await Cliente.findAll({
+      where: {
+        nome: {
+          [Op.iLike]: `%${nome}%`, // Busca case-insensitive que contém a string do nome
+        }
+      }
+    });
+    res.json(clientes);
+  } catch (error) {
+    console.error('Erro ao buscar clientes:', error);
+    res.status(500).json({ message: 'Erro ao buscar clientes.' });
   }
 });
 

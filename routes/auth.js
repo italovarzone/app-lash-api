@@ -7,6 +7,7 @@ const sendVerificationEmail = require('../utils/sendVerificationEmail');
 const router = Router();
 let tempUserData = {};
 
+// Rota de registro de usuário
 router.post('/register', async (req, res) => {
   const { nome, email, dataNascimento, telefone, password } = req.body;
 
@@ -40,6 +41,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Rota de verificação do código de registro
 router.post('/verify-code', async (req, res) => {
   const { email, code } = req.body;
 
@@ -95,7 +97,9 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, 'secretkey', { expiresIn: '1h' });
-    res.json({ token });
+
+    // Inclua o nome do usuário na resposta
+    res.json({ token, nome: user.nome });
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     res.status(500).json({ error: 'Erro ao fazer login' });
