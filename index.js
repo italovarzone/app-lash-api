@@ -6,6 +6,7 @@ const clienteRoutes = require('./routes/clientes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const bodyParser = require('body-parser');
+const anamneseRouter = require('./routes/anamnese');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use('/api', authRoutes);
 app.use('/api', clienteRoutes);
+app.use('/api', anamneseRouter);
 
 sequelize.sync()
   .then(() => {
